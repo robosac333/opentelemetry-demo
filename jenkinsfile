@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'deployment', url: 'https://github.com/robosac333/opentelemetry-demo.git'
+                git branch: 'deployment', credentialsId: 'jk-gh-tk', url: 'https://github.com/robosac333/opentelemetry-demo'
             }
         }
     }
