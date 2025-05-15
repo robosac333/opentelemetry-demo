@@ -8,10 +8,16 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'deployment', credentialsId: 'jk-gh-tk', url: 'https://github.com/robosac333/opentelemetry-demo'
+                checkout([$class: 'GitSCM',
+                    branches: [[name: '*/deployment']],
+                    userRemoteConfigs: [[
+                        url: 'https://github.com/robosac333/opentelemetry-demo',
+                        credentialsId: 'jk-gh-tk'
+                    ]]
+                ])
             }
         }
-        
+
         stage('Pre-pull Images with Auth') {
         steps {
             script {
