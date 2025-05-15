@@ -1,10 +1,54 @@
 pipeline {
     agent any
 
+    environment {
+        COMPOSE_FILE = 'docker-compose.yml'
+    }
+
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'deployment', credentialsId: 'jk-gh-tk', url: 'https://github.com/robosac333/opentelemetry-demo'
+                git branch: 'deployment', 
+                    credentialsId: 'jk-gh-tk', 
+                    url: 'https://github.com/robosac333/opentelemetry-demo'
+            }
+        }
+
+        stage('Start Services') {
+            steps {
+                script {
+                    sh 'docker compose up -d'
+                }
+            }
+        }
+
+        stage('Wait for Services') {
+            steps {
+                // Optional: Wait for a few seconds to ensure services initialize
+                sh 'sleep 10'
+            }
+        }
+
+        stage('Verify Running Containers') {
+            steps {
+                script {
+                    sh 'docker ps'
+                }
+            }
+        }
+
+        // Optional: Run tests or validations here
+        // stage('Run Tests') {
+        //     steps {
+        //         sh 'docker compose exec <service_name> <test_command>'
+        //     }
+        // }
+
+        stage('Tear Down') {
+            steps {
+                script {
+                    sh 'docker compose down -v'
+                }
             }
         }
     }
