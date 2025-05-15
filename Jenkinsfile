@@ -8,16 +8,15 @@ pipeline {
     stages {
 
 
-        stage('Pre-pull Images with Auth') {
-        steps {
-            script {
-            docker.withRegistry('https://index.docker.io/v1/', 'jk-dh-tk') {
-                sh 'docker pull valkey/valkey:8.1-alpine'
-            }
-            }
-        }
-        }
-
+        // stage('Pre-pull Images with Auth') {
+        // steps {
+        //     script {
+        //     docker.withRegistry('https://index.docker.io/v1/', 'jk-dh-tk') {
+        //         sh 'docker pull valkey/valkey:8.1-alpine'
+        //     }
+        //     }
+        // }
+    
         stage('Build Images') {
             steps {
                 script {
