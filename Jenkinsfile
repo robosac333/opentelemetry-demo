@@ -13,7 +13,11 @@ pipeline {
                     url: 'https://github.com/robosac333/opentelemetry-demo'
             }
         }
-
+        stage('Pre-pull Valkey Image') {
+            steps {
+                sh 'docker pull valkey/valkey:8.1-alpine || true'
+            }
+}
         stage('Start Services') {
             steps {
                 script {
