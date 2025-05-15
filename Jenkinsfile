@@ -25,7 +25,7 @@ pipeline {
         stage('Wait for Services') {
             steps {
                 // Optional: Wait for a few seconds to ensure services initialize
-                sh 'sleep 15'
+                sh 'sleep 10'
             }
         }
 
