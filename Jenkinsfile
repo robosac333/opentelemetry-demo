@@ -1,0 +1,11 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'deployment', credentialsId: 'jk-gh-tk', url: 'https://github.com/robosac333/opentelemetry-demo'
+            }
+        }
+    }
+}
