@@ -23,7 +23,8 @@ pipeline {
 
                         // Build and tag Docker image
                         sh '''
-                            docker compose build -t $IMAGE_NAME .
+                            docker build -t $IMAGE_NAME .
+
                             docker tag $IMAGE_NAME:latest $ECR_REGISTRY/$IMAGE_NAME:latest
                             docker push $ECR_REGISTRY/$IMAGE_NAME:latest
                         '''
