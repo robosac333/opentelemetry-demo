@@ -1,42 +1,38 @@
 pipeline {
     agent any
+
+    environment {
+        AWS_REGION = 'us-west-2'
+        ECR_REGISTRY = '242201279990.dkr.ecr.us-west-2.amazonaws.com'
+        IMAGE_NAME = 'oteldemo/cicdpipeline'
+    }
+
     stages {
-
-        
-        // stage('Pre-pull Images with Auth') {
-        // steps {
-        //     script {
-        //     docker.withRegistry('https://index.docker.io/v1/', 'jk-dh-tk') {
-        //         sh 'docker pull valkey/valkey:8.1-alpine'
-        //     }
-        //     }
-        // }
-    
-//         stage('Build Images') {
-//             steps {
-//                 script {
-//                     sh 'docker compose build'
-//                 }
-//             }
-//         }
-
         stage('Push to ECR') {
             steps {
-                script {
-                    // Login to ECR
-                    sh 'aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 242201279990.dkr.ecr.us-west-2.amazonaws.com'
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: 'sachin'
+                ]]) {
+                    script {
+                        // Login to ECR
+                        sh '''
+                            aws ecr get-login-password --region $AWS_REGION | \
+                            docker login --username AWS --password-stdin $ECR_REGISTRY
+                        '''
 
-                    // Build and tag the Docker image
-                    sh 'docker compose build -t oteldemo/cicdpipeline .'
-
-                    // Tag the image for ECR
-                    sh 'docker tag oteldemo/cicdpipeline:latest 242201279990.dkr.ecr.us-west-2.amazonaws.com/oteldemo/cicdpipeline:latest'
-
-                    // Push the image to ECR
-                    sh 'docker push 242201279990.dkr.ecr.us-west-2.amazonaws.com/oteldemo/cicdpipeline:latest'
+                        // Build and tag Docker image
+                        sh '''
+                            docker compose build -t $IMAGE_NAME .
+                            docker tag $IMAGE_NAME:latest $ECR_REGISTRY/$IMAGE_NAME:latest
+                            docker push $ECR_REGISTRY/$IMAGE_NAME:latest
+                        '''
+                    }
                 }
             }
         }
+    }
+}
 
 //         stage('Start Services') {
 //             steps {
@@ -75,5 +71,5 @@ pipeline {
 //                 }
 //             }
 //         }
-    }
-}
+//     }
+// }
