@@ -1,57 +1,47 @@
 pipeline {
-    agent {
-        kubernetes {
-            yamlFile 'kaniko-pod-template.yaml'
-        }
-    }
-    environment {
-        IMAGE = 'robosac333/opentelemetry-demo:latest'
-    }
+    agent any
     stages {
-        stage('Build and Push') {
+
+        
+        // stage('Pre-pull Images with Auth') {
+        // steps {
+        //     script {
+        //     docker.withRegistry('https://index.docker.io/v1/', 'jk-dh-tk') {
+        //         sh 'docker pull valkey/valkey:8.1-alpine'
+        //     }
+        //     }
+        // }
+    
+        stage('Build Images') {
             steps {
-                container('kaniko') {
-                    sh '''
-                    /kaniko/executor \
-                      --dockerfile=Dockerfile \
-                      --context=${WORKSPACE} \
-                      --destination=docker.io/${IMAGE} \
-                      --cleanup
-                    '''
+                script {
+                    sh 'docker compose build'
                 }
             }
         }
 
-        // stage('Build Images') {
-        //     steps {
-        //         script {
-        //             sh 'docker compose build'
-        //         }
-        //     }
-        // }
+        stage('Start Services') {
+            steps {
+                script {
+                    sh 'docker compose up -d'
+                }
+            }
+        }
 
-        // stage('Start Services') {
-        //     steps {
-        //         script {
-        //             sh 'docker compose up -d'
-        //         }
-        //     }
-        // }
+        stage('Wait for Services') {
+            steps {
+                // Optional: Wait for a few seconds to ensure services initialize
+                sh 'sleep 10'
+            }
+        }
 
-        // stage('Wait for Services') {
-        //     steps {
-        //         // Optional: Wait for a few seconds to ensure services initialize
-        //         sh 'sleep 10'
-        //     }
-        // }
-
-        // stage('Verify Running Containers') {
-        //     steps {
-        //         script {
-        //             sh 'docker ps'
-        //         }
-        //     }
-        // }
+        stage('Verify Running Containers') {
+            steps {
+                script {
+                    sh 'docker ps'
+                }
+            }
+        }
 
         // Optional: Run tests or validations here
         // stage('Run Tests') {
@@ -60,12 +50,12 @@ pipeline {
         //     }
         // }
 
-        // stage('Tear Down') {
-        //     steps {
-        //         script {
-        //             sh 'docker compose down -v'
-        //         }
-        //     }
-        // }
+        stage('Tear Down') {
+            steps {
+                script {
+                    sh 'docker compose down -v'
+                }
+            }
+        }
     }
 }
