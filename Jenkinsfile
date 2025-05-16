@@ -5,6 +5,7 @@ pipeline {
         AWS_REGION = 'us-west-2'
         ECR_REGISTRY = '242201279990.dkr.ecr.us-west-2.amazonaws.com'
         IMAGE_NAME = 'oteldemo/cicdpipeline'
+        SERVICE_NAME = 'cicdpipeline' // must match service name in docker-compose.yml
     }
 
     stages {
@@ -15,17 +16,18 @@ pipeline {
                     credentialsId: 'sachin'
                 ]]) {
                     script {
-                        // Login to ECR
                         sh '''
+                            echo "Logging into ECR..."
                             aws ecr get-login-password --region $AWS_REGION | \
                             docker login --username AWS --password-stdin $ECR_REGISTRY
-                        '''
 
-                        // Build and tag Docker image
-                        sh '''
-                            docker build -t $IMAGE_NAME .
+                            echo "Building Docker image..."
+                            docker compose build
 
-                            docker tag $IMAGE_NAME:latest $ECR_REGISTRY/$IMAGE_NAME:latest
+                            echo "Tagging image..."
+                            docker tag $SERVICE_NAME:latest $ECR_REGISTRY/$IMAGE_NAME:latest
+
+                            echo "Pushing image to ECR..."
                             docker push $ECR_REGISTRY/$IMAGE_NAME:latest
                         '''
                     }
@@ -34,6 +36,7 @@ pipeline {
         }
     }
 }
+
 
 //         stage('Start Services') {
 //             steps {
