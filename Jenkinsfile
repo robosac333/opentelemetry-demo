@@ -24,8 +24,8 @@ pipeline {
                             echo "Building Docker image..."
                             docker compose build
 
-                            // echo "Tagging image..."
-                            // docker tag $IMAGE_NAME:latest-load-generator $ECR_REGISTRY/$IMAGE_NAME:latest-load-generator
+                            # echo "Tagging image..."
+                            # docker tag $IMAGE_NAME:latest-load-generator $ECR_REGISTRY/$IMAGE_NAME:latest-load-generator
 
                             echo "Tagging and pushing each image..."
                             for IMAGE in $(docker images --format "{{.Repository}}:{{.Tag}}" | grep oteldemo/cicdpipeline); do
@@ -34,8 +34,8 @@ pipeline {
                               docker push $ECR_REGISTRY/oteldemo/cicdpipeline:$NAME_TAG
                             done
 
-                            // echo "Pushing image to ECR..."
-                            // docker push $ECR_REGISTRY/$IMAGE_NAME:latest
+                            # echo "Pushing image to ECR..."
+                            # docker push $ECR_REGISTRY/$IMAGE_NAME:latest
                         '''
                     }
                 }
