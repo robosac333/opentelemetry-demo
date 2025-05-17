@@ -53,86 +53,16 @@ pipeline {
                     credentialsId: 'k8-token', 
                     namespace: "${env.K8S_NAMESPACE}", 
                     serverUrl: 'https://8D0F91A9A30A61724E5D09917F7D3EC4.gr7.us-west-2.eks.amazonaws.com'
-                ]]) {
-                    script {
+                ]]){
+                    script{
 sh '''
-echo "Deploying each image from ECR to EKS..."
-
-for TAG in $(docker images --format "{{.Tag}}" | grep -v '<none>'); do
-DEPLOYMENT_NAME=$TAG
-IMAGE_URI=${ECR_REGISTRY}/${IMAGE_NAME}:$TAG
-
-echo "Applying deployment for ${DEPLOYMENT_NAME} with image ${IMAGE_URI}"
-
-cat <<EOF | kubectl apply -f -
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: "${DEPLOYMENT_NAME}"
-  namespace: "${K8S_NAMESPACE}"
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: "${DEPLOYMENT_NAME}"
-  template:
-    metadata:
-      labels:
-        app: "${DEPLOYMENT_NAME}"
-    spec:
-      containers:
-      - name: "${DEPLOYMENT_NAME}"
-        image: "${IMAGE_URI}"
-        ports:
-        - containerPort: 80
-EOF
-done
+echo "Deploying to Kubernetes..."
+git clone https://github.com/robosac333/opentelemetry-demo.git
+cd opentelemetry-demo/kubernetes
+kubectl apply -f opentelemetry-demo.yaml -n otel-demo
 '''
-                    }
-                }
-            }
+           }
         }
 
     }
 }
-
-
-//         stage('Start Services') {
-//             steps {
-//                 script {
-//                     sh 'docker compose up -d'
-//                 }
-//             }
-//         }
-//
-//         stage('Wait for Services') {
-//             steps {
-//                 // Optional: Wait for a few seconds to ensure services initialize
-//                 sh 'sleep 10'
-//             }
-//         }
-//
-//         stage('Verify Running Containers') {
-//             steps {
-//                 script {
-//                     sh 'docker ps'
-//                 }
-//             }
-//         }
-
-        // Optional: Run tests or validations here
-        // stage('Run Tests') {
-        //     steps {
-        //         sh 'docker compose exec <service_name> <test_command>'
-        //     }
-        // }
-
-//         stage('Tear Down') {
-//             steps {
-//                 script {
-//                     sh 'docker compose down -v'
-//                 }
-//             }
-//         }
-//     }
-// }
