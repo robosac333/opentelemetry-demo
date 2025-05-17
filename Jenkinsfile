@@ -61,8 +61,11 @@ git clone https://github.com/robosac333/opentelemetry-demo.git
 cd opentelemetry-demo/kubernetes
 kubectl apply -f opentelemetry-demo.yaml -n otel-demo
 '''
-           }
-        }
+                    }
+                }
 
+            }
+        }
     }
+
 }
