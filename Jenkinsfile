@@ -79,6 +79,7 @@ kubectl apply -f opentelemetry-demo.yaml -n $K8S_DEPLOYMENT --validate=false
                 script {
 sh '''
 echo "Waiting for rollout to complete..."
+set +e
 kubectl rollout status deployment/$K8S_DEPLOYMENT -n $K8S_NAMESPACE --timeout=60s
 ROLLOUT_STATUS=$?
 set -e
