@@ -8,7 +8,7 @@ pipeline {
         SERVICE_NAME = 'cicdpipeline' 
         APP_NAME = 'otel-demo'
         ECR_REPOSITORY = "${ECR_REGISTRY}/${IMAGE_NAME}"
-        K8S_NAMESPACE = 'webapps'
+        K8S_NAMESPACE = 'otel-demo'
         K8S_DEPLOYMENT = 'otel-demo'
     }
 
