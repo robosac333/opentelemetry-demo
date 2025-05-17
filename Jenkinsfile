@@ -56,38 +56,38 @@ pipeline {
                 ]]) {
                     script {
                         sh '''
-                            echo "Deploying each image from ECR to EKS..."
+                        echo "Deploying each image from ECR to EKS..."
 
-                            for TAG in $(docker images --format "{{.Tag}}" | grep -v '<none>'); do
-                            DEPLOYMENT_NAME=${TAG}
-                            IMAGE_URI=${ECR_REGISTRY}/${IMAGE_NAME}:${TAG}
-                            
-                            echo "Applying deployment for ${DEPLOYMENT_NAME} with image ${IMAGE_URI}"
+                        for TAG in $(docker images --format "{{.Tag}}" | grep -v '<none>'); do
+                        DEPLOYMENT_NAME=$TAG
+                        IMAGE_URI=${ECR_REGISTRY}/${IMAGE_NAME}:$TAG
 
-                            kubectl apply -f - <<EOF
-        apiVersion: apps/v1
-        kind: Deployment
-        metadata:
-        name: ${DEPLOYMENT_NAME}
-        namespace: ${K8S_NAMESPACE}
-        spec:
-        replicas: 1
-        selector:
-            matchLabels:
-            app: ${DEPLOYMENT_NAME}
-        template:
-            metadata:
-            labels:
-                app: ${DEPLOYMENT_NAME}
-            spec:
-            containers:
-            - name: ${DEPLOYMENT_NAME}
-                image: ${IMAGE_URI}
-                ports:
-                - containerPort: 80
-        EOF
+                        echo "Applying deployment for ${DEPLOYMENT_NAME} with image ${IMAGE_URI}"
 
-                            done
+                        cat <<EOF | kubectl apply -f -
+                        apiVersion: apps/v1
+                        kind: Deployment
+                        metadata:
+                        name: ${DEPLOYMENT_NAME}
+                        namespace: ${K8S_NAMESPACE}
+                        spec:
+                        replicas: 1
+                        selector:
+                            matchLabels:
+                            app: ${DEPLOYMENT_NAME}
+                        template:
+                            metadata:
+                            labels:
+                                app: ${DEPLOYMENT_NAME}
+                            spec:
+                            containers:
+                            - name: ${DEPLOYMENT_NAME}
+                                image: ${IMAGE_URI}
+                                ports:
+                                - containerPort: 80
+                        EOF
+
+                        done
                         '''
                     }
                 }
