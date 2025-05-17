@@ -52,7 +52,7 @@ pipeline {
                     contextName: '', 
                     credentialsId: 'k8-token', 
                     namespace: "${env.K8S_NAMESPACE}", 
-                    serverUrl: 'https://8D0F91A9A30A61724E5D09917F7D3EC4.gr7.us-west-2.eks.amazonaws.com'
+                    serverUrl: 'https://43B7F7363C5652FE933434304BA92ED8.gr7.us-west-2.eks.amazonaws.com'
                 ]]){
                     script{
 sh '''
@@ -67,5 +67,4 @@ kubectl apply -f opentelemetry-demo.yaml -n otel-demo
             }
         }
     }
-
 }
