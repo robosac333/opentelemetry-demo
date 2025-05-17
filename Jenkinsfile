@@ -60,6 +60,18 @@ sh '''
 echo "Deploying to Kubernetes..."
 cd kubernetes
 kubectl apply -f opentelemetry-demo.yaml -n $K8S_DEPLOYMENT --validate=false
+
+echo "Waiting for deployments to be ready..."
+DEPLOYMENTS=$(kubectl get deployments -n $K8S_NAMESPACE -o jsonpath='{.items[*].metadata.name}')
+
+for DEPLOYMENT in $DEPLOYMENTS; do
+    echo "Checking deployment status for: $DEPLOYMENT"
+    kubectl rollout status deployment/$DEPLOYMENT -n $K8S_NAMESPACE
+    if [ $? -ne 0 ]; then
+        echo "Deployment $DEPLOYMENT failed to roll out"
+        exit 1
+    fi
+done
 '''
                     }
                 }
