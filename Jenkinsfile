@@ -9,6 +9,7 @@ pipeline {
         APP_NAME = 'otel-demo'
         ECR_REPOSITORY = "${ECR_REGISTRY}/${IMAGE_NAME}"
         K8S_NAMESPACE = 'webapps'
+        K8S_DEPLOYMENT = 'otel-demo'
     }
 
     stages {
@@ -57,9 +58,8 @@ pipeline {
                     script{
 sh '''
 echo "Deploying to Kubernetes..."
-git clone https://github.com/robosac333/opentelemetry-demo.git
-cd opentelemetry-demo/kubernetes
-kubectl apply -f opentelemetry-demo.yaml -n otel-demo
+cd kubernetes
+kubectl apply -f opentelemetry-demo.yaml -n $K8S_DEPLOYMENT --validate=false
 '''
                     }
                 }
