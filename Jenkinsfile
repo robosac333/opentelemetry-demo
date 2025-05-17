@@ -5,7 +5,10 @@ pipeline {
         AWS_REGION = 'us-west-2'
         ECR_REGISTRY = '242201279990.dkr.ecr.us-west-2.amazonaws.com'
         IMAGE_NAME = 'oteldemo/cicdpipeline'
-        SERVICE_NAME = 'cicdpipeline' // must match service name in docker-compose.yml
+        SERVICE_NAME = 'cicdpipeline' 
+        APP_NAME = 'otel-demo'
+        ECR_REPOSITORY = "${ECR_REGISTRY}/${IMAGE_NAME}"
+        K8S_NAMESPACE = 'webapps'
     }
 
     stages {
@@ -41,6 +44,56 @@ pipeline {
                 }
             }
         }
+        stage('Deploy To Kubernetes') {
+            steps {
+                withKubeCredentials(kubectlCredentials: [[
+                    caCertificate: '', 
+                    clusterName: 'opentelemetry-cluster', 
+                    contextName: '', 
+                    credentialsId: 'k8s-token', 
+                    namespace: "${env.K8S_NAMESPACE}", 
+                    serverUrl: 'https://8D0F91A9A30A61724E5D09917F7D3EC4.gr7.us-west-2.eks.amazonaws.com'
+                ]]) {
+                    script {
+                        sh '''
+                            echo "Deploying each image from ECR to EKS..."
+
+                            for TAG in $(docker images --format "{{.Tag}}" | grep -v '<none>'); do
+                            DEPLOYMENT_NAME=${TAG}
+                            IMAGE_URI=${ECR_REGISTRY}/${IMAGE_NAME}:${TAG}
+                            
+                            echo "Applying deployment for ${DEPLOYMENT_NAME} with image ${IMAGE_URI}"
+
+                            kubectl apply -f - <<EOF
+        apiVersion: apps/v1
+        kind: Deployment
+        metadata:
+        name: ${DEPLOYMENT_NAME}
+        namespace: ${K8S_NAMESPACE}
+        spec:
+        replicas: 1
+        selector:
+            matchLabels:
+            app: ${DEPLOYMENT_NAME}
+        template:
+            metadata:
+            labels:
+                app: ${DEPLOYMENT_NAME}
+            spec:
+            containers:
+            - name: ${DEPLOYMENT_NAME}
+                image: ${IMAGE_URI}
+                ports:
+                - containerPort: 80
+        EOF
+
+                            done
+                        '''
+                    }
+                }
+            }
+        }
+
     }
 }
 
