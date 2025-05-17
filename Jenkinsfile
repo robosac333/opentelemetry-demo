@@ -99,10 +99,10 @@ fi
 
     post {
         success {
-            echo "🚀 Pipeline completed successfully! All services deployed."
+            echo "Pipeline completed successfully! All services deployed."
         }
         failure {
-            echo "⚠️ Pipeline failed. Some deployments may have been rolled back. Check the logs for details."
+            echo "Pipeline failed. Some deployments may have been rolled back. Check the logs for details."
         }
     }
 }
