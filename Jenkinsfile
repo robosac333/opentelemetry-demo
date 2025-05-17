@@ -64,29 +64,28 @@ IMAGE_URI=${ECR_REGISTRY}/${IMAGE_NAME}:$TAG
 
 echo "Applying deployment for ${DEPLOYMENT_NAME} with image ${IMAGE_URI}"
 
-cat <<-EOF | kubectl apply -f -
+cat <<EOF | kubectl apply -f -
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-name: ${DEPLOYMENT_NAME}
-namespace: ${K8S_NAMESPACE}
+  name: "${DEPLOYMENT_NAME}"
+  namespace: "${K8S_NAMESPACE}"
 spec:
-replicas: 1
-selector:
+  replicas: 1
+  selector:
     matchLabels:
-    app: ${DEPLOYMENT_NAME}
-template:
+      app: "${DEPLOYMENT_NAME}"
+  template:
     metadata:
-    labels:
-        app: ${DEPLOYMENT_NAME}
+      labels:
+        app: "${DEPLOYMENT_NAME}"
     spec:
-    containers:
-    - name: ${DEPLOYMENT_NAME}
-        image: ${IMAGE_URI}
+      containers:
+      - name: "${DEPLOYMENT_NAME}"
+        image: "${IMAGE_URI}"
         ports:
         - containerPort: 80
 EOF
-
 done
 '''
                     }
