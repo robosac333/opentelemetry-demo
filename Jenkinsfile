@@ -66,5 +66,34 @@ kubectl apply -f opentelemetry-demo.yaml -n $K8S_DEPLOYMENT --validate=false
 
             }
         }
+        stage('Validate and Rollback') {
+            steps {
+                            withKubeCredentials(kubectlCredentials: [[
+                                caCertificate: '',
+                                clusterName: 'opentelemetry-cluster',
+                                contextName: '',
+                                credentialsId: 'k8-token',
+                                namespace: "${env.K8S_NAMESPACE}",
+                                serverUrl: 'https://43B7F7363C5652FE933434304BA92ED8.gr7.us-west-2.eks.amazonaws.com'
+                            ]]){
+                script {
+sh '''
+echo "Waiting for rollout to complete..."
+kubectl rollout status deployment/$K8S_DEPLOYMENT -n $K8S_NAMESPACE --timeout=60s
+ROLLOUT_STATUS=$?
+set -e
+
+if [ $ROLLOUT_STATUS -ne 0 ]; then
+    echo "❌ Rollout failed. Rolling back..."
+    kubectl rollout undo deployment/$K8S_DEPLOYMENT -n $K8S_NAMESPACE
+    echo "🔁 Rollback complete."
+    exit 1
+else
+    echo "✅ Rollout successful."
+fi
+'''
+                }
+            }
+        }
     }
 }
