@@ -67,28 +67,28 @@ DEPLOYMENTS=$(kubectl get deployments -n $K8S_NAMESPACE -o jsonpath='{.items[*].
 FAILED_DEPLOYMENTS=0
 for DEPLOYMENT in $DEPLOYMENTS; do
     if echo "$EXCLUDED_DEPLOYMENTS" | grep -w "$DEPLOYMENT" > /dev/null; then
-        echo "⏭️ Skipping status check for excluded deployment: $DEPLOYMENT"
+        echo "Skipping status check for excluded deployment: $DEPLOYMENT"
         continue
     fi
-    echo "⏳ Checking deployment status for: $DEPLOYMENT"
+    echo "Checking deployment status for: $DEPLOYMENT"
     kubectl rollout status deployment/$DEPLOYMENT -n $K8S_NAMESPACE
     ROLLOUT_STATUS=$?
 
     if [ $ROLLOUT_STATUS -ne 0 ]; then
-        echo "❌ Rollout failed for $DEPLOYMENT. Rolling back..."
+        echo "Rollout failed for $DEPLOYMENT. Rolling back..."
         kubectl rollout undo deployment/$DEPLOYMENT -n $K8S_NAMESPACE
-        echo "🔁 Rollback complete for $DEPLOYMENT."
+        echo "Rollback complete for $DEPLOYMENT."
         FAILED_DEPLOYMENTS=$((FAILED_DEPLOYMENTS+1))
     else
-        echo "✅ Rollout successful for $DEPLOYMENT."
+        echo "Rollout successful for $DEPLOYMENT."
     fi
 done
 
 if [ $FAILED_DEPLOYMENTS -gt 0 ]; then
-    echo "❌ $FAILED_DEPLOYMENTS deployment(s) failed and were rolled back."
+    echo "$FAILED_DEPLOYMENTS deployment(s) failed and were rolled back."
     exit 1
 else
-    echo "🎉 All deployments are ready and running successfully!"
+    echo "All deployments are ready and running successfully!"
 fi
 '''
                     }

@@ -12,7 +12,7 @@ const ProductCatalogService = () => ({
     return !!currencyCode && currencyCode !== defaultCurrencyCode
       ? await CurrencyGateway.convert(price, currencyCode)
       : price;
-  },
+  },s
   async listProducts(currencyCode = 'USD') {
     const { products: productList } = await ProductCatalogGateway.listProducts();
 
