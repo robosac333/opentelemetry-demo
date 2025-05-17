@@ -50,7 +50,7 @@ pipeline {
                     caCertificate: '', 
                     clusterName: 'opentelemetry-cluster', 
                     contextName: '', 
-                    credentialsId: 'k8s-token', 
+                    credentialsId: 'k8-token', 
                     namespace: "${env.K8S_NAMESPACE}", 
                     serverUrl: 'https://8D0F91A9A30A61724E5D09917F7D3EC4.gr7.us-west-2.eks.amazonaws.com'
                 ]]) {
