@@ -60,21 +60,6 @@ sh '''
 echo "Deploying to Kubernetes..."
 cd kubernetes
 kubectl apply -f opentelemetry-demo.yaml -n $K8S_DEPLOYMENT --validate=false
-
-echo "Waiting for rollout to complete..."
-set +e
-kubectl rollout status deployment/$K8S_DEPLOYMENT -n $K8S_NAMESPACE --timeout=60s
-ROLLOUT_STATUS=$?
-set -e
-
-if [ $ROLLOUT_STATUS -ne 0 ]; then
-    echo "❌ Rollout failed. Rolling back..."
-    kubectl rollout undo deployment/$K8S_DEPLOYMENT -n $K8S_NAMESPACE
-    echo "🔁 Rollback complete."
-    exit 1
-else
-    echo "✅ Rollout successful."
-fi
 '''
                     }
                 }
